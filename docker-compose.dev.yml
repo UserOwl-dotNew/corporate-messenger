@@ -1,0 +1,39 @@
+services:
+  # Только инфраструктура, сервисы запускаются локально для отладки
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    ports:
+      - "5432:5432"
+
+  elasticsearch:
+    extends:
+      file: docker-compose.yml
+      service: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+    ports:
+      - "6379:6379"
+
+  zookeeper:
+    extends:
+      file: docker-compose.yml
+      service: zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    extends:
+      file: docker-compose.yml
+      service: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092

@@ -1,0 +1,15 @@
+### Команды для докера
+#### Останавливаем всё
+docker compose down -v
+
+#### Очищаем кэш билда
+docker builder prune -f
+
+#### Пересобираем и запускаем
+docker compose up -d --build
+
+#### Проверяем статус
+docker compose ps
+
+#### Проверяем логи
+docker compose logs -f
