@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Message.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-service</a> &gt; <a href="index.source.html" class="el_package">com.messenger.chat.entity</a> &gt; <span class="el_source">Message.java</span></div><h1>Message.java</h1><pre class="source lang-java linenums">package com.messenger.chat.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = &quot;messages&quot;)
+<span class="pc bnc" id="L13" title="All 78 branches missed.">@Data</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+public class Message {
+
+    @Id
+    @GeneratedValue(generator = &quot;UUID&quot;)
+    @GenericGenerator(name = &quot;UUID&quot;, strategy = &quot;org.hibernate.id.UUIDGenerator&quot;)
+    @Column(columnDefinition = &quot;UUID&quot;)
+<span class="fc" id="L21">    private UUID id;</span>
+
+    @Column(name = &quot;chat_id&quot;, columnDefinition = &quot;UUID&quot;)
+<span class="fc" id="L24">    private UUID chatId;</span>
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = &quot;chat_id&quot;, insertable = false, updatable = false)
+<span class="nc" id="L28">    private Chat chat;</span>
+
+    @Column(name = &quot;sender_id&quot;, columnDefinition = &quot;UUID&quot;)
+<span class="fc" id="L31">    private UUID senderId;</span>
+
+    @Column(name = &quot;encrypted_content&quot;, nullable = false)
+<span class="fc" id="L34">    private String encryptedContent;</span>
+
+    @Column(name = &quot;content_hash&quot;, nullable = false, length = 64)
+<span class="fc" id="L37">    private String contentHash;</span>
+
+    @Column(name = &quot;blockchain_tx_id&quot;, length = 255)
+<span class="fc" id="L40">    private String blockchainTxId;</span>
+
+    @Column(name = &quot;sent_at&quot;)
+<span class="fc" id="L43">    private LocalDateTime sentAt;</span>
+
+<span class="fc" id="L45">    @Column(name = &quot;is_deleted&quot;)</span>
+<span class="fc" id="L46">    private Boolean isDeleted = false;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
