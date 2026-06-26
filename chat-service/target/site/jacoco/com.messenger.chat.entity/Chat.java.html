@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Chat.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">chat-service</a> &gt; <a href="index.source.html" class="el_package">com.messenger.chat.entity</a> &gt; <span class="el_source">Chat.java</span></div><h1>Chat.java</h1><pre class="source lang-java linenums">package com.messenger.chat.entity;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+@Entity
+@Table(name = &quot;chats&quot;)
+<span class="pc bnc" id="L15" title="All 62 branches missed.">@Data</span>
+<span class="fc" id="L16">@NoArgsConstructor</span>
+public class Chat {
+
+    @Id
+    @GeneratedValue(generator = &quot;UUID&quot;)
+    @GenericGenerator(name = &quot;UUID&quot;, strategy = &quot;org.hibernate.id.UUIDGenerator&quot;)
+    @Column(columnDefinition = &quot;UUID&quot;)
+<span class="fc" id="L23">    private UUID id;</span>
+
+    @Column(length = 100)
+<span class="fc" id="L26">    private String name;</span>
+
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+<span class="fc" id="L30">    private ChatType type;</span>
+
+    @Column(name = &quot;created_by&quot;, columnDefinition = &quot;UUID&quot;)
+<span class="fc" id="L33">    private UUID createdBy;</span>
+
+    @Column(name = &quot;created_at&quot;)
+<span class="fc" id="L36">    private LocalDateTime createdAt;</span>
+
+<span class="fc" id="L38">    @OneToMany(mappedBy = &quot;chat&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</span>
+<span class="nc" id="L39">    private List&lt;ChatParticipant&gt; participants = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L41">    @OneToMany(mappedBy = &quot;chat&quot;, cascade = CascadeType.ALL, orphanRemoval = true)</span>
+<span class="nc" id="L42">    private List&lt;Message&gt; messages = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L44">    public enum ChatType {</span>
+<span class="fc" id="L45">        DIALOG, GROUP</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
