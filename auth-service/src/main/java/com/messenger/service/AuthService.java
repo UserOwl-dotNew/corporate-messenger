@@ -1,5 +1,7 @@
 package com.messenger.service;
 
+
+import org.springframework.transaction.annotation.Transactional;
 import com.messenger.dto.AuthResponse;
 import com.messenger.dto.LoginRequest;
 import com.messenger.dto.RegisterRequest;
@@ -66,7 +68,8 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, "Bearer", user.getUsername(), user.getRole());
     }
 
-    public AuthResponse login(LoginRequest request) {
+    @Transactional
+    public AuthResponse login(LoginRequest request)  {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
