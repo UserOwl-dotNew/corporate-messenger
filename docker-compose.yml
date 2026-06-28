@@ -172,6 +172,20 @@ services:
       - kafka
     restart: unless-stopped
 
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: messenger-api-gateway
+    ports:
+      - "${GATEWAY_PORT}:8080"
+    depends_on:
+      - auth-service
+      - chat-service
+      - blockchain-adapter
+      - search-engine
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   elasticsearch_data:

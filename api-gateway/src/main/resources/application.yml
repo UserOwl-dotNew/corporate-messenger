@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8080
+          predicates:
+            - Path=/api/v1/auth/**, /api/v1/users/**
+
+        - id: chat-service
+          uri: http://chat-service:8080
+          predicates:
+            - Path=/api/v1/chats/**, /ws/**
+
+        - id: search-service
+          uri: http://search-engine:8000
+          predicates:
+            - Path=/api/v1/search/**
+
+        - id: blockchain-service
+          uri: http://blockchain-adapter:8000
+          predicates:
+            - Path=/api/v1/blockchain/**
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 10
+            redis-rate-limiter.burstCapacity: 20
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: DEBUG
