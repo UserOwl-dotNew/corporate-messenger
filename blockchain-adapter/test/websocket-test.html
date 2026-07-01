@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test with JWT</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .message-area { height: 400px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+        .message { margin: 5px 0; padding: 5px; border-radius: 5px; }
+        .message-mine { background: #dcf8c6; text-align: right; }
+        .message-other { background: #f0f0f0; }
+        .system-message { background: #fff3cd; color: #856404; }
+        .input-area { display: flex; gap: 10px; }
+        .input-area input { flex: 1; padding: 8px; }
+        .input-area button { padding: 8px 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Chat with JWT</h1>
+
+        <div>
+            <h3>Authentication</h3>
+            <div>
+                <input type="text" id="token" placeholder="JWT Token" style="width: 60%; padding: 8px;">
+                <button onclick="connect()">Connect</button>
+                <button onclick="disconnect()">Disconnect</button>
+            </div>
+            <div>
+                <input type="text" id="chatId" placeholder="Chat ID" style="width: 60%; padding: 8px; margin-top: 10px;">
+            </div>
+        </div>
+
+        <div id="status" class="status disconnected">Disconnected</div>
+
+        <div id="messages" class="message-area"></div>
+
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type your message..." disabled>
+            <button onclick="sendMessage()" id="sendButton" disabled>Send</button>
+        </div>
+    </div>
+
+    <script>
+        let stompClient = null;
+        let currentChatId = null;
+        let userId = '11111111-1111-1111-1111-111111111111'; // Default test user
+
+        function connect() {
+            const token = document.getElementById('token').value;
+            const chatId = document.getElementById('chatId').value;
+
+            if (!token) {
+                alert('Please enter JWT token');
+                return;
+            }
+            if (!chatId) {
+                alert('Please enter Chat ID');
+                return;
+            }
+
+            currentChatId = chatId;
+
+            const socket = new SockJS('http://localhost:8080/ws');
+            stompClient = Stomp.over(socket);
+
+            // Добавляем токен в headers
+            const headers = {
+                'Authorization': 'Bearer ' + token,
+                'X-UserId': userId
+            };
+
+            stompClient.connect(headers, function(frame) {
+                setStatus('Connected', 'connected');
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendButton').disabled = false;
+
+                // Подписываемся на чат
+                stompClient.subscribe('/topic/chat/' + chatId, function(message) {
+                    displayMessage(JSON.parse(message.body), false);
+                });
+
+                // Подписываемся на уведомления
+                stompClient.subscribe('/queue/notifications', function(message) {
+                    const notification = JSON.parse(message.body);
+                    displaySystemMessage('🔔 ' + notification.message);
+                });
+
+                displaySystemMessage('✅ Connected to chat: ' + chatId);
+            }, function(error) {
+                setStatus('Connection failed: ' + error, 'disconnected');
+                console.error('Connection error:', error);
+            });
+        }
+
+        function disconnect() {
+            if (stompClient) {
+                stompClient.disconnect(function() {
+                    setStatus('Disconnected', 'disconnected');
+                    document.getElementById('messageInput').disabled = true;
+                    document.getElementById('sendButton').disabled = true;
+                    displaySystemMessage('❌ Disconnected');
+                });
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (!content || !stompClient || !currentChatId) {
+                return;
+            }
+
+            const message = {
+                chatId: currentChatId,
+                content: content,
+                senderId: userId
+            };
+
+            stompClient.send('/app/chat.send', {}, JSON.stringify(message));
+            displayMessage(message, true);
+            input.value = '';
+        }
+
+        function displayMessage(message, isMine) {
+            const messagesDiv = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + (isMine ? 'message-mine' : 'message-other');
+
+            const time = new Date(message.timestamp || Date.now()).toLocaleTimeString();
+            msgDiv.innerHTML = `
+                <strong>${isMine ? '👤 You' : '👤 ' + (message.senderId || 'Unknown')}</strong>
+                <span style="float: right; font-size: 0.8em; color: #666;">${time}</span>
+                <br>${message.content || message.message}
+                ${message.blockchainTxId ? '<br><span style="font-size: 0.7em; color: #28a745;">🔗 Verified on blockchain</span>' : ''}
+            `;
+
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function displaySystemMessage(text) {
+            const messagesDiv = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message system-message';
+            msgDiv.textContent = text;
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function setStatus(text, className) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = text;
+            statusDiv.className = 'status ' + className;
+        }
+
+        // Enter key support
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

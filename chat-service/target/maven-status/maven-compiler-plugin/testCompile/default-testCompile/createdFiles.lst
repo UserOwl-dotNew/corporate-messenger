@@ -1,9 +1,0 @@
-com\messenger\chat\controller\ChatControllerIntegrationTest.class
-com\messenger\chat\controller\WebSocketIntegrationTest$1.class
-com\messenger\chat\config\TestWebSocketConfig.class
-com\messenger\chat\service\ChatServiceTest.class
-com\messenger\chat\service\MessageServiceTest.class
-com\messenger\chat\repository\RepositoryTest.class
-com\messenger\chat\service\KafkaProducerServiceTest.class
-com\messenger\chat\controller\WebSocketIntegrationTest$2.class
-com\messenger\chat\controller\WebSocketIntegrationTest.class
